@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { BookOpen } from "lucide-react";
 import emailjs from "@emailjs/browser";
+import { Toaster, toast } from "react-hot-toast";
 import {
   Github,
   Mail,
@@ -296,6 +297,30 @@ function CustomCursor() {
 
   return (
     <>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            background: "#0f0f0f",
+            color: "#fff",
+            border: "1px solid rgba(139,92,246,.25)",
+            borderRadius: "14px",
+          },
+          success: {
+            iconTheme: {
+              primary: "#22c55e",
+              secondary: "#fff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#fff",
+            },
+          },
+        }}
+      />
       <motion.div
         className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full"
         style={{
@@ -1487,6 +1512,8 @@ function Contact() {
 
       setSent(true);
 
+      toast.success("Message sent successfully!");
+
       setForm({
         name: "",
         email: "",
@@ -1497,7 +1524,7 @@ function Contact() {
       setTimeout(() => setSent(false), 6000);
     } catch (error) {
       console.error(error);
-      alert("Failed to send message. Please try again.");
+      toast.error("Failed to send message. Please try again.");
     } finally {
       setSending(false);
     }
