@@ -1492,8 +1492,44 @@ function Contact() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
 
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const newErrors = {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    };
+
+    if (form.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters.";
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+
+    if (form.subject.trim().length < 5) {
+      newErrors.subject = "Subject must be at least 5 characters.";
+    }
+
+    if (form.message.trim().length < 20) {
+      newErrors.message = "Message must be at least 20 characters.";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.values(newErrors).some((error) => error !== "")) {
+      return;
+    }
 
     setSending(true);
 
@@ -1659,47 +1695,129 @@ function Contact() {
               ) : (
                 <form
                   onSubmit={handleSubmit}
+                  noValidate
                   className="flex flex-col gap-4 h-full"
                 >
                   <div className="grid sm:grid-cols-2 gap-4">
-                    <input
-                      className={inputCls}
-                      placeholder="Your name"
-                      value={form.name}
-                      onChange={(e) =>
-                        setForm({ ...form, name: e.target.value })
-                      }
-                      required
-                    />
-                    <input
-                      className={inputCls}
-                      type="email"
-                      placeholder="Email address"
-                      value={form.email}
-                      onChange={(e) =>
-                        setForm({ ...form, email: e.target.value })
-                      }
-                      required
-                    />
+                    <div>
+                      <input
+                        className={`${inputCls} ${errors.name ? "border-red-500 focus:border-red-500" : ""}`}
+                        placeholder="Your name"
+                        value={form.name}
+                        onChange={(e) => {
+                          const value = e.target.value;
+
+                          setForm({
+                            ...form,
+                            name: value,
+                          });
+
+                          setErrors({
+                            ...errors,
+                            name:
+                              value.trim().length < 2
+                                ? "Name must be at least 2 characters."
+                                : "",
+                          });
+                        }}
+                        required
+                      />
+
+                      {errors.name && (
+                        <p className="mt-1 text-xs text-red-400">
+                          {errors.name}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <input
+                        className={`${inputCls} ${errors.email ? "border-red-500 focus:border-red-500" : ""}`}
+                        type="text"
+                        placeholder="Email address"
+                        value={form.email}
+                        onChange={(e) => {
+                          const value = e.target.value;
+
+                          setForm({
+                            ...form,
+                            email: value,
+                          });
+
+                          setErrors({
+                            ...errors,
+                            email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                              ? ""
+                              : "Please enter a valid email address.",
+                          });
+                        }}
+                        required
+                      />
+
+                      {errors.email && (
+                        <p className="mt-1 text-xs text-red-400">
+                          {errors.email}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <input
-                    className={inputCls}
+                    className={`${inputCls} ${errors.subject ? "border-red-500 focus:border-red-500" : ""}`}
                     placeholder="Subject"
                     value={form.subject}
-                    onChange={(e) =>
-                      setForm({ ...form, subject: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      setForm({
+                        ...form,
+                        subject: value,
+                      });
+
+                      setErrors({
+                        ...errors,
+                        subject:
+                          value.trim().length < 5
+                            ? "Subject must be at least 5 characters."
+                            : "",
+                      });
+                    }}
                     required
                   />
+
+                  {errors.subject && (
+                    <p className="mt-1 text-xs text-red-400">
+                      {errors.subject}
+                    </p>
+                  )}
+
                   <textarea
-                    className={`${inputCls} resize-none min-h-[160px]`}
+                    className={`${inputCls} resize-none min-h-[160px] ${errors.message ? "border-red-500 focus:border-red-500" : ""}`}
                     placeholder="Tell me about your project or opportunity..."
                     value={form.message}
-                    onChange={(e) =>
-                      setForm({ ...form, message: e.target.value })
-                    }
-                    required
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      setForm({
+                        ...form,
+                        message: value,
+                      });
+
+                      setErrors({
+                        ...errors,
+                        message:
+                          value.trim().length < 20
+                            ? "Message must be at least 20 characters."
+                            : "",
+                      });
+                    }}
                   />
+
+                  {errors.message && (
+                    <p className="mt-1 text-xs text-red-400">
+                      {errors.message}
+                    </p>
+                  )}
+
                   <button
                     type="submit"
                     disabled={sending}
