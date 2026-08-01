@@ -1491,6 +1491,7 @@ function Contact() {
   });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [website, setWebsite] = useState("");
 
   const [errors, setErrors] = useState({
     name: "",
@@ -1501,6 +1502,11 @@ function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (website.trim() !== "") {
+      console.warn("Spam bot detected.");
+      return;
+    }
 
     const newErrors = {
       name: "",
@@ -1557,7 +1563,7 @@ function Contact() {
         message: "",
       });
 
-      setTimeout(() => setSent(false), 6000);
+      setTimeout(() => setSent(false), 5000);
     } catch (error) {
       console.error(error);
       toast.error("Failed to send message. Please try again.");
@@ -1685,11 +1691,13 @@ function Contact() {
                     <CheckCircle size={56} className="text-emerald-400" />
                   </motion.div>
                   <h3 className="font-display font-black text-2xl text-white">
-                    Message Sent!
+                    Message Sent Successfully!
                   </h3>
-                  <p className="text-white/50 text-sm max-w-xs">
-                    Thanks for reaching out. I'll get back to you within 24
-                    hours.
+
+                  <p className="text-white/50 text-sm max-w-md leading-relaxed">
+                    Thank you for reaching out! Your message has been delivered
+                    successfully. I'll review it and get back to you as soon as
+                    possible.
                   </p>
                 </motion.div>
               ) : (
@@ -1698,6 +1706,16 @@ function Contact() {
                   noValidate
                   className="flex flex-col gap-4 h-full"
                 >
+                  <input
+                    type="text"
+                    name="website"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    autoComplete="off"
+                    tabIndex={-1}
+                    className="hidden"
+                  />
+
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <input
