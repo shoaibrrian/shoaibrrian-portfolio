@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { BookOpen } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import { Toaster, toast } from "react-hot-toast";
@@ -149,6 +149,7 @@ const PROJECTS = [
       "Express.js",
     ],
     github: "https://github.com/shoaibrrian",
+    liveUrl: "https://passionfoot.in/",
     gradient: "from-violet-900/40 via-purple-900/20 to-transparent",
     icon: <Heart size={48} className="text-violet-400/30" />,
   },
@@ -178,6 +179,7 @@ const PROJECTS = [
       "Google Maps API",
     ],
     github: "https://github.com/shoaibrrian",
+    liveUrl: "https://passionfoot.in/",
     gradient: "from-cyan-900/40 via-teal-900/20 to-transparent",
     icon: <Activity size={48} className="text-cyan-400/30" />,
   },
@@ -952,42 +954,49 @@ function Skills() {
 // ─── projects ──────────────────────────────────────────────────────────────────
 
 function Projects() {
+  const [activeId, setActiveId] = useState(PROJECTS[0].id);
+  const active = PROJECTS.find((p) => p.id === activeId)!;
+
   return (
     <section id="projects" className="py-28 max-w-7xl mx-auto px-6">
       <SectionHeader label="featured projects" title="Things I've Built" />
 
-      <div className="flex flex-col gap-8 mt-16">
-        {PROJECTS.map((p, i) => (
-          <motion.div
+      <div className="flex flex-wrap gap-3 mt-12 mb-8">
+        {PROJECTS.map((p) => (
+          <button
             key={p.id}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{
-              duration: 0.7,
-              delay: i * 0.1,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+            onClick={() => setActiveId(p.id)}
+            className={`px-5 py-2.5 rounded-full text-sm font-mono font-medium border transition-all duration-300 ${
+              activeId === p.id
+                ? "bg-white text-black border-white"
+                : "border-white/15 text-white/50 hover:text-white hover:border-white/30"
+            }`}
           >
-            <ProjectCard project={p} flipped={i % 2 === 1} />
-          </motion.div>
+            {p.name}
+          </button>
         ))}
       </div>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={active.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <ProjectCard project={active} />
+        </motion.div>
+      </AnimatePresence>
     </section>
   );
 }
 
-function ProjectCard({
-  project: p,
-  flipped,
-}: {
-  project: (typeof PROJECTS)[number];
-  flipped: boolean;
-}) {
+function ProjectCard({ project: p }: { project: (typeof PROJECTS)[number] }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div
-      className={`glass rounded-3xl overflow-hidden border border-white/8 group transition-all duration-500 ${hovered ? "border-opacity-40" : ""}`}
+      className="glass rounded-3xl overflow-hidden border border-white/8 transition-all duration-500"
       style={{
         borderColor: hovered ? `${p.color}40` : undefined,
         boxShadow: hovered ? `0 0 60px ${p.color}15` : undefined,
@@ -995,18 +1004,15 @@ function ProjectCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div
-        className={`grid lg:grid-cols-2 ${flipped ? "lg:grid-flow-dense" : ""}`}
-      >
+      <div className="grid lg:grid-cols-2">
         {/* visual */}
         <div
-          className={`relative h-64 lg:h-auto flex items-center justify-center overflow-hidden ${flipped ? "lg:col-start-2" : ""}`}
+          className="relative min-h-[380px] overflow-hidden"
           style={{
             background: `linear-gradient(135deg, ${p.color}20, transparent)`,
           }}
         >
           <div className={`absolute inset-0 bg-gradient-to-br ${p.gradient}`} />
-          {/* decorative grid */}
           <div
             className="absolute inset-0 opacity-20"
             style={{
@@ -1015,28 +1021,11 @@ function ProjectCard({
               backgroundSize: "24px 24px",
             }}
           />
-          <div className="relative z-10 flex flex-col items-center gap-4">
-            <div style={{ color: `${p.color}60` }}>{p.icon}</div>
-            <div
-              className="font-display font-black text-6xl"
-              style={{ color: `${p.color}20` }}
-            >
-              {p.id}
-            </div>
-          </div>
-          {/* animated border */}
-          <motion.div
-            className="absolute bottom-0 left-0 h-0.5"
-            style={{
-              background: `linear-gradient(90deg, transparent, ${p.color}, transparent)`,
-            }}
-            initial={{ width: "0%" }}
-            animate={{ width: hovered ? "100%" : "0%" }}
-            transition={{ duration: 0.6 }}
-          />
+          <ProjectThumbnail url={p.liveUrl} />
         </div>
+
         {/* content */}
-        <div className="p-8 lg:p-10 flex flex-col justify-between">
+        <div className="p-8 lg:p-10 flex flex-col justify-between relative z-10">
           <div>
             <div className="flex items-start justify-between mb-4">
               <div>
@@ -1089,19 +1078,93 @@ function ProjectCard({
             >
               <Github size={14} /> GitHub
             </a>
-            <button
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg"
-              style={{
-                background: `${p.color}20`,
-                color: p.color,
-                border: `1px solid ${p.color}30`,
-              }}
-            >
-              <ExternalLink size={14} /> Case Study
-            </button>
+            {p.liveUrl && (
+              <a
+                href={p.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg"
+                style={{
+                  background: `${p.color}20`,
+                  color: p.color,
+                  border: `1px solid ${p.color}30`,
+                }}
+              >
+                <ExternalLink size={14} /> Live Site
+              </a>
+            )}
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ProjectThumbnail({ url }: { url?: string }) {
+  const [active, setActive] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0.3);
+
+  const DESKTOP_WIDTH = 1440;
+  const DESKTOP_HEIGHT = 900;
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const containerHeight = containerRef.current.offsetHeight;
+        // scale so the 1440x900 frame fully covers the container (no gaps)
+        const scaleX = containerWidth / DESKTOP_WIDTH;
+        const scaleY = containerHeight / DESKTOP_HEIGHT;
+        setScale(Math.max(scaleX, scaleY));
+      }
+    };
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
+  }, []);
+
+  if (!url) {
+    return (
+      <div className="relative z-10 flex flex-col items-center gap-3 text-white/30">
+        <Globe size={40} strokeWidth={1.2} />
+        <p className="text-sm font-mono">Live preview coming soon</p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="absolute inset-0 z-10 overflow-hidden"
+      onMouseEnter={() => setActive(true)}
+      onMouseLeave={() => setActive(false)}
+    >
+      <div
+        style={{
+          width: DESKTOP_WIDTH,
+          height: DESKTOP_HEIGHT,
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+          pointerEvents: active ? "auto" : "none",
+        }}
+      >
+        <iframe
+          src={url}
+          title="project-preview"
+          loading="lazy"
+          width={DESKTOP_WIDTH}
+          height={DESKTOP_HEIGHT}
+          className="border-0"
+        />
+      </div>
+      {!active && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/40 transition-colors duration-300 opacity-0 hover:opacity-100 pointer-events-none">
+          <span className="text-white text-xs font-mono px-3 py-1.5 rounded-md bg-black/70 border border-white/20">
+            Hover to explore
+          </span>
+        </div>
+      )}
     </div>
   );
 }
