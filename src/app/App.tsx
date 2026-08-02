@@ -1901,18 +1901,26 @@ function Footer() {
               {
                 icon: <Github size={15} />,
                 href: "https://github.com/shoaibrrian",
+                label: "GitHub Profile",
               },
               {
                 icon: <Linkedin size={15} />,
                 href: "https://www.linkedin.com/in/shoaibrahmanrian",
+                label: "LinkedIn Profile",
               },
-              { icon: <Mail size={15} />, href: "mailto:shoaibrian@gmail.com" },
+              {
+                icon: <Mail size={15} />,
+                href: "mailto:shoaibrian@gmail.com",
+                label: "Send Email",
+              },
             ].map((s, i) => (
               <a
                 key={i}
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label={s.label}
+                title={s.label}
                 className="p-2.5 glass rounded-xl text-white/40 hover:text-violet-300 border border-white/6 hover:border-violet-500/30 transition-all duration-300"
               >
                 {s.icon}
