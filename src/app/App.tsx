@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import profileImage from "@/imports/IMG_3542-removebg-preview.png";
+import MultiDeviceMockup from "./components/MultiDeviceMockup";
 
 // ─── data ─────────────────────────────────────────────────────────────────────
 
@@ -1021,7 +1022,7 @@ function ProjectCard({ project: p }: { project: (typeof PROJECTS)[number] }) {
               backgroundSize: "24px 24px",
             }}
           />
-          <ProjectThumbnail url={p.liveUrl} />
+          <MultiDeviceMockup url={p.liveUrl} />
         </div>
 
         {/* content */}
@@ -1100,71 +1101,41 @@ function ProjectCard({ project: p }: { project: (typeof PROJECTS)[number] }) {
   );
 }
 
-function ProjectThumbnail({ url }: { url?: string }) {
-  const [active, setActive] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.3);
-
-  const DESKTOP_WIDTH = 1440;
-  const DESKTOP_HEIGHT = 900;
-
-  useEffect(() => {
-    const updateScale = () => {
-      if (containerRef.current) {
-        const containerWidth = containerRef.current.offsetWidth;
-        const containerHeight = containerRef.current.offsetHeight;
-        // scale so the 1440x900 frame fully covers the container (no gaps)
-        const scaleX = containerWidth / DESKTOP_WIDTH;
-        const scaleY = containerHeight / DESKTOP_HEIGHT;
-        setScale(Math.max(scaleX, scaleY));
-      }
-    };
-    updateScale();
-    window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
-  }, []);
-
+function ProjectMockup({ url }: { url?: string }) {
   if (!url) {
     return (
-      <div className="relative z-10 flex flex-col items-center gap-3 text-white/30">
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white/30">
         <Globe size={40} strokeWidth={1.2} />
-        <p className="text-sm font-mono">Live preview coming soon</p>
+        <p className="text-sm font-mono mt-3">Live preview coming soon</p>
       </div>
     );
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 z-10 overflow-hidden"
-      onMouseEnter={() => setActive(true)}
-      onMouseLeave={() => setActive(false)}
-    >
-      <div
-        style={{
-          width: DESKTOP_WIDTH,
-          height: DESKTOP_HEIGHT,
-          transform: `scale(${scale})`,
-          transformOrigin: "top left",
-          pointerEvents: active ? "auto" : "none",
-        }}
-      >
+    <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+      <div className="relative w-[90%]">
+        {/* Laptop Frame */}
+        <img
+          src="/mockups/desktop.svg"
+          alt="Laptop"
+          className="w-full h-auto select-none pointer-events-none"
+          draggable={false}
+        />
+
+        {/* Live Website */}
         <iframe
           src={url}
-          title="project-preview"
+          title="Laptop Preview"
           loading="lazy"
-          width={DESKTOP_WIDTH}
-          height={DESKTOP_HEIGHT}
-          className="border-0"
+          className="absolute border-0"
+          style={{
+            left: "8.05%",
+            top: "2.7%",
+            width: "83.9%",
+            height: "77.5%",
+          }}
         />
       </div>
-      {!active && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/40 transition-colors duration-300 opacity-0 hover:opacity-100 pointer-events-none">
-          <span className="text-white text-xs font-mono px-3 py-1.5 rounded-md bg-black/70 border border-white/20">
-            Hover to explore
-          </span>
-        </div>
-      )}
     </div>
   );
 }
