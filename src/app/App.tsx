@@ -21,7 +21,6 @@ import {
   Calendar,
   Menu,
   X,
-  Heart,
   Activity,
   Leaf,
   Send,
@@ -68,6 +67,7 @@ const MARQUEE_TECHS = [
   "Node.js",
   "Express.js",
   "MongoDB",
+  "Docker",
   "Tailwind CSS",
   "JavaScript",
   "Python",
@@ -99,7 +99,7 @@ const SKILLS = {
   database: {
     icon: <Database size={16} />,
     color: "#10b981",
-    items: ["MongoDB"],
+    items: ["MongoDB", "Docker"],
   },
   languages: {
     icon: <Code2 size={16} />,
