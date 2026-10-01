@@ -584,7 +584,7 @@ function Hero() {
               />
             </a>
             <a
-              href="/files/Shoaib-Rahman-Rian_CV.pdf"
+              href="/files/Shoaib_Rahman_Rian_CV.pdf"
               download
               className="flex items-center gap-2 px-6 py-3 rounded-2xl glass text-white/80 text-sm font-semibold hover:text-white hover:border-violet-500/40 transition-all duration-300 border border-white/10"
             >
